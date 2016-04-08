@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="me.bowarren.myapplication">
 
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
 
     <application
@@ -17,6 +18,9 @@
             android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="com.google.android.glass.action.VOICE_TRIGGER" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+
             </intent-filter>
 
             <meta-data

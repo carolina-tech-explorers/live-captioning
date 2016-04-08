@@ -16,10 +16,17 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.client.Firebase;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     public boolean go = true;
+
+    Firebase myFirebaseRef;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Firebase.setAndroidContext(this);
+        myFirebaseRef = new Firebase("https://live-captioning.firebaseio.com");
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -106,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
             //Log.d(TAG, "onResults " + data);
             ArrayList<String> matches = data.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             Log.e("ffff", matches.toString());
+            sendToFirebase(matches.toString());
 //            float[] value = data.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
 //            mVoiceRecognition.mText.setText("Results: " + String.valueOf(matches.size()));
 //
@@ -166,5 +177,13 @@ public class MainActivity extends AppCompatActivity {
         public void onRmsChanged(float rmsdB) {
 //            Log.d(TAG, "onRmsChanged");
         }
+    }
+
+    private void sendToFirebase(String matches){
+        Firebase postRef = myFirebaseRef.child("new_posts");
+        Map<String, String> post = new HashMap<String, String>();
+        post.put("matches", matches);
+        post.put("time", ((Long) System.currentTimeMillis()).toString() );
+        postRef.push().setValue(post);
     }
 }

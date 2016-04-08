@@ -1,5 +1,9 @@
 package me.bowarren.myapplication;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.glass.media.Sounds;
 import com.google.android.glass.widget.CardBuilder;
 import com.google.android.glass.widget.CardScrollAdapter;
@@ -14,6 +18,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,6 +26,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * An {@link Activity} showing a tuggable "Hello World!" card.
@@ -33,6 +42,8 @@ import java.util.ArrayList;
  * @see <a href="https://developers.google.com/glass/develop/gdk/touch">GDK Developer Guide</a>
  */
 public class MainActivity extends Activity {
+    Firebase myFirebaseRef;
+
 
     /**
      * {@link CardScrollView} to use as the main content view.
@@ -44,9 +55,28 @@ public class MainActivity extends Activity {
      */
     private View mView;
 
+
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+
+        Log.e("myapp", "in the beginning...");
+        Firebase.setAndroidContext(this);
+        myFirebaseRef = new Firebase("https://live-captioning.firebaseio.com");
+        myFirebaseRef.child("new_posts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                HashMap<String,String> newest = getLatestResponse(snapshot.getValue());
+                if(newest == null)
+                    return;
+                String matches = newest.get("matches");
+                String first_match = matches.substring(1,matches.indexOf(','));
+                Log.e("aaa", first_match);
+                archiveToFirebase(newest);
+
+            }
+            @Override public void onCancelled(FirebaseError error) { }
+        });
 
         mView = buildView();
 
@@ -110,8 +140,36 @@ public class MainActivity extends Activity {
         //card.setText(R.string.hello_world);
         return card.getView();
     }
+    
+
+    private void archiveToFirebase(HashMap<String,String> post){
+        Firebase postRef = myFirebaseRef.child("post_archive");
+        postRef.push().setValue(post);
+        myFirebaseRef.child("new_posts").removeValue();
+    }
+
+    private HashMap<String,String> getLatestResponse(Object snapshotvalue){
+
+        HashMap<String,HashMap<String,String>> h_snapshot = (HashMap<String,HashMap<String,String>>) snapshotvalue;
+        HashMap<String,String> newest = null;
+
+        if (h_snapshot == null)
+                return null;
 
 
+        for (Map.Entry<String, HashMap<String,String>> entry : h_snapshot.entrySet()){
+            String key = entry.getKey();
+            HashMap<String,String> post = entry.getValue();
+            if(newest == null){
+                newest = post;
+            }
+            else{
+                if(Long.parseLong(post.get("time")) > Long.parseLong(newest.get("time"))){
+                    newest = post;
+                }
+            }
+        }
 
-
+        return newest;
+    }
 }
