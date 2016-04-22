@@ -3,6 +3,7 @@ package me.bowarren.myapplication;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 //                while(true){
 //                    if(go==true) {
 //                        go=false;
+                mute();
                 recognizeSpeech();
                 Log.e("fff", "after starting recog");
 //                    }
@@ -65,6 +67,18 @@ public class MainActivity extends AppCompatActivity {
                 //Log.e("fff", "after starting recog");
             }
         });
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        unmute();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        mute();
     }
 
     @Override
@@ -163,6 +177,9 @@ public class MainActivity extends AppCompatActivity {
         public void onError(int error) {
             Log.d(TAG, "error " + error);
             //error 6 = speech timeout, so start it on that again
+            if(error == recognizer.ERROR_SPEECH_TIMEOUT || error == recognizer.ERROR_NO_MATCH){
+                recognizeSpeech();
+            }
         }
 
         public void onEvent(int eventType, Bundle params) {
@@ -185,5 +202,26 @@ public class MainActivity extends AppCompatActivity {
         post.put("matches", matches);
         post.put("time", ((Long) System.currentTimeMillis()).toString() );
         postRef.push().setValue(post);
+    }
+
+
+    private void mute(){
+        //mute audio
+
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        amanager.setStreamMute(AudioManager.STREAM_RING, true);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+    }
+    private void unmute(){
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+
+        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+        amanager.setStreamMute(AudioManager.STREAM_ALARM, false);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        amanager.setStreamMute(AudioManager.STREAM_RING, false);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
     }
 }
