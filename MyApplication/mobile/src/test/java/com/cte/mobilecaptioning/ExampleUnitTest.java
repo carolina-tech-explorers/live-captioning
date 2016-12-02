@@ -1,4 +1,4 @@
-package me.bowarren.myapplication;
+package com.cte.mobilecaptioning;
 
 import org.junit.Test;
 

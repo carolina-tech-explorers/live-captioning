@@ -5,7 +5,8 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "me.bowarren.myapplication"
+        //applicationId "me.bowarren.myapplication"
+        applicationId "com.cte.mobilecaptioning"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1

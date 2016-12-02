@@ -12,7 +12,8 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "me.bowarren.myapplication"
+        //applicationId "me.bowarren.myapplication"
+        applicationId "com.cte.glasscaptioning"
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1

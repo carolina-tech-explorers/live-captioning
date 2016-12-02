@@ -1,4 +1,4 @@
-package me.bowarren.myapplication;
+package com.cte.mobilecaptioning;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
