@@ -1,4 +1,4 @@
-# live-captioning
-Glass app to handle continuous, live speech transcription
+# Captioning system for Google Glass
+This is a Glass app to handle continuous, live speech transcription
 
-this is a change that adam made
+
