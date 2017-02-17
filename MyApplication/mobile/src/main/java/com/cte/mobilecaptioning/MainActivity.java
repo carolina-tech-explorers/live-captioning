@@ -1,5 +1,6 @@
 package com.cte.mobilecaptioning;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -8,6 +9,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
+
         Firebase.setAndroidContext(this);
         myFirebaseRef = new Firebase("https://live-captioning.firebaseio.com");
 
@@ -42,27 +46,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-
-
-                //begin my own
-//                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-//                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-//                SpeechRecognizer recognizer = SpeechRecognizer.createSpeechRecognizer(getApplicationContext());
-//                recognizer.setRecognitionListener(new VoiceRecognitionListener(recognizer, intent));
-//                recognizer.startListening(intent);
-
-//                while(true){
-//                    if(go==true) {
-//                        go=false;
                 mute();
                 recognizeSpeech();
                 Log.e("fff", "after starting recog");
-//                    }
-//                }
 
-                //Log.e("fff", "after starting recog");
             }
         });
     }
@@ -103,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void recognizeSpeech(){
+        Log.e("fff", "in recognize speech");
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, new Long(15000));
@@ -125,32 +113,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void onResults(Bundle data) {
-            //Log.d(TAG, "onResults " + data);
             ArrayList<String> matches = data.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             Log.e("ffff", matches.toString());
             sendToFirebase(matches.toString());
-//            float[] value = data.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
-//            mVoiceRecognition.mText.setText("Results: " + String.valueOf(matches.size()));
-//
-//            if(value != null) { // CONFIDENCE_SCORES wasn't added until API level 14
-//                String[] combined = new String[matches.size()];
-//                for(int i = 0; i < matches.size(); i++) // The size of the data and value is the same
-//                    combined[i] = matches.get(i).toString() + "\nScore: " + Float.toString(value[i]);
-//                mVoiceRecognition.mList.setAdapter(new ArrayAdapter<String>(mVoiceRecognition, android.R.layout.simple_list_item_1,combined));
-//            } else
-//                mVoiceRecognition.mList.setAdapter(new ArrayAdapter<String>(mVoiceRecognition, android.R.layout.simple_list_item_1,matches));
             recognizeSpeech();
-
-//            new Thread() {
-//                public void run() {
-//
-//                    runOnUiThread(new Runnable() {
-//                        public void run() {
-//                            recognizeSpeech();
-//                        }
-//                    });
-//                }
-//            }.start();
         }
 
 
